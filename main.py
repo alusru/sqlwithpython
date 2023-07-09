@@ -47,11 +47,10 @@ def db_connect(host, user, password, db):
 
 
 def exec_query(connection, query):
-    conn = connection.cursor()
-
     try:
+        conn = connection.cursor()
         conn.execute(query)
-        conn.commit()
+        connection.commit()
         print("Query was successful")
     except Error as err:
         print(f"Error: {err}")
@@ -77,3 +76,13 @@ if __name__ == '__main__':
     phone_number varchar(20)
     );
     """)
+
+    insert_data = """
+    insert into person values
+    (1, 'kim', 'possible','1990-01-02',33,'0147896563'),
+    (2, 'tom', 'possible','1991-01-02',32,'014789656343'),
+    (3, 'tim', 'possible','1992-01-02',31,'0147896563245');
+    """
+
+    exec_query(con, insert_data)
+

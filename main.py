@@ -56,6 +56,18 @@ def exec_query(connection, query):
         print(f"Error: {err}")
 
 
+def read_data(connection, query):
+    conn = connection.cursor()
+    result = None
+    try:
+
+        conn.execute(query)
+        result = conn.fetchall()
+        return result
+    except Error as err:
+        print(f"Error: {err}")
+
+
 if __name__ == '__main__':
     connect = mysql_connection(os.getenv('host'), os.getenv('user'), os.getenv('password'))
 
@@ -67,7 +79,7 @@ if __name__ == '__main__':
     exec_query(
         con,
         """
-    create table person(
+    create table if not exists `person`(
     id int primary key,
     name varchar(30) not null,
     surname varchar(30) not null,
@@ -86,3 +98,72 @@ if __name__ == '__main__':
 
     exec_query(con, insert_data)
 
+    # select by column
+    select_data = """
+    select name,age from person;
+    """
+
+    results = read_data(con, select_data)
+
+    for result in results:
+        print(result)
+    # result:
+    # ('kim', 33)
+    # ('tom', 32)
+    # ('tim', 31)
+
+    # filter by year
+    select_data1 = """
+    select year(date_of_birth) from person
+    """
+
+    results = read_data(con, select_data1)
+    for result in results:
+        print(result)
+
+    # result:
+    # (1990,)
+    # (1991,)
+    # (1992,)
+
+    # using distinct
+    select_data2 = """
+       select distinct year(date_of_birth) from person
+       """
+
+    results = read_data(con, select_data2)
+    for result in results:
+        print(result)
+
+    # result:
+    # (1990,)
+    # (1991,)
+    # (1992,)
+
+    #  using where clause
+    select_data3 = """
+           select * from person where date_of_birth < '1993-01-01'
+           """
+
+    results = read_data(con, select_data3)
+    for result in results:
+        print(result)
+
+    # result:
+    # (1, 'kim', 'possible', datetime.date(1990, 1, 2), 33, '0147896563')
+    # (2, 'tom', 'possible', datetime.date(1991, 1, 2), 32, '014789656343')
+    # (3, 'tim', 'possible', datetime.date(1992, 1, 2), 31, '0147896563245')
+
+    #  orderby
+    select_data4 = """
+               select * from person order by age asc;
+               """
+
+    results = read_data(con, select_data4)
+    for result in results:
+        print(result)
+
+    # result:
+    # (3, 'tim', 'possible', datetime.date(1992, 1, 2), 31, '0147896563245')
+    # (2, 'tom', 'possible', datetime.date(1991, 1, 2), 32, '014789656343')
+    # (1, 'kim', 'possible', datetime.date(1990, 1, 2), 33, '0147896563')

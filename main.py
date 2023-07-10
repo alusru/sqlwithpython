@@ -68,6 +68,16 @@ def read_data(connection, query):
         print(f"Error: {err}")
 
 
+def pandas_df(results):
+    db_stuff = []
+    for res in results:
+        result = list(res)
+        db_stuff.append(result)
+    cols = ['id', 'name', 'surname', 'date_of_birth', 'age', 'phone_number']
+    df = pd.DataFrame(db_stuff, columns=cols)
+    print(df)
+
+
 if __name__ == '__main__':
     connect = mysql_connection(os.getenv('host'), os.getenv('user'), os.getenv('password'))
 
@@ -160,6 +170,7 @@ if __name__ == '__main__':
                """
 
     results = read_data(con, select_data4)
+
     for result in results:
         print(result)
 
@@ -167,3 +178,16 @@ if __name__ == '__main__':
     # (3, 'tim', 'possible', datetime.date(1992, 1, 2), 31, '0147896563245')
     # (2, 'tom', 'possible', datetime.date(1991, 1, 2), 32, '014789656343')
     # (1, 'kim', 'possible', datetime.date(1990, 1, 2), 33, '0147896563')
+
+    # display as dataframe
+    pandas_df(results)
+
+    # result:
+    # """
+    #            id name   surname date_of_birth  age   phone_number
+    #     0   3  tim  possible    1992-01-02   31  0147896563245
+    #     1   2  tom  possible    1991-01-02   32   014789656343
+    #     2   1  kim  possible    1990-01-02   33     0147896563
+    #
+    # """
+
